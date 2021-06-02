@@ -15,4 +15,9 @@ class IndexController
     {
         return ['view' => 'index.phtml', 'args' => ['title' => 'Hello World']];
     }
+
+    public function helloAction(string $name): array
+    {
+        return ['view' => 'index.phtml', 'args' => ['title' => 'Hello ' . $name]];
+    }
 }

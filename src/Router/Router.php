@@ -40,18 +40,56 @@ class Router
      */
     public function getHandler(string $requestUri): callable
     {
-        return $this->resolve($this->routingRules[$requestUri] ?? $this->routingRules['default']);
+        $route = $this->findMatchingRoute($requestUri);
+        if (null === $route) {
+            return $this->resolve($this->routingRules['default']);
+        }
+
+        return $this->resolve($route['handler'], $route['matches']);
+    }
+
+    /**
+     * @param string $requestUri
+     * @return array|null
+     */
+    protected function findMatchingRoute(string $requestUri): ?array
+    {
+        $matches = [];
+        /**
+         * @var string $rule
+         * @var array $handler
+         */
+        foreach ($this->routingRules['routes'] as $rule => $handler) {
+            if (preg_match($rule, $requestUri, $matches)) {
+                return [
+                    'handler' => $handler,
+                    'matches' => [$matches[1]],
+                ];
+            }
+        }
+        return null;
     }
 
     /**
      * @param array{controller: class-string, action: string} $rule
+     * @param array|null $arguments
      * @return callable
      */
-    protected function resolve(array $rule): callable
+    protected function resolve(array $rule, ?array $arguments = null): callable
     {
-        return [
-            $this->container->get($rule['controller']),
-            $rule['action']
-        ];
+        if (null === $arguments) {
+            return [
+                $this->container->get($rule['controller']),
+                $rule['action'],
+            ];
+        }
+
+        return fn(): callable => call_user_func_array(
+            [
+                $this->container->get($rule['controller']),
+                $rule['action'],
+            ],
+            $arguments
+        );
     }
 }

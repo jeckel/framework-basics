@@ -22,6 +22,15 @@ return [
     'renderer' => static fn(Container $container): Renderer => $container->get(Renderer::class),
 
     'routing_rules' => [
-        'default' => ['controller' => IndexController::class, 'action' => 'indexAction']
+        'default' => [
+            'controller' => IndexController::class,
+            'action' => 'indexAction'
+        ],
+        'routes' => [
+            "/^\/hello\/([a-zA-Z0-9]*)$/m" => [
+                'controller' => IndexController::class,
+                'action' => 'helloAction'
+            ]
+        ]
     ]
 ];

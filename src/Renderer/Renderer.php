@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace App\Renderer;
 
-use Exception;
-
+/**
+ * Class Renderer
+ * @package App\Renderer
+ */
 class Renderer
 {
     protected string $templatePath;
