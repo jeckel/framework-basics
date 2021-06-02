@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * @author: Julien Mercier-Rojas <julien@jeckel-lab.fr>
+ * Created at: 02/06/2021
+ */
+
+?>
+<html lang="fr">
+<head>
+    <title><?= $title ?></title>
+</head>
+<body>
+    <h1><?= $title ?></h1>
+    <?= $content ?? ''?>
+    <div><?php if ($view !== null) { include __DIR__ . DIRECTORY_SEPARATOR . $view; } ?></div>
+</body>
+</html>

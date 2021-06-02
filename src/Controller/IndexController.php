@@ -11,8 +11,8 @@ namespace App\Controller;
 
 class IndexController
 {
-    public function indexAction(): string
+    public function indexAction(): array
     {
-        return 'Hello World';
+        return ['view' => 'index.phtml', 'args' => ['title' => 'Hello World']];
     }
 }

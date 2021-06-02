@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Container\Container;
+use App\Renderer\Renderer;
 use App\Router\Router;
 
 class Kernel
@@ -28,12 +29,14 @@ class Kernel
         /** @var Router $router */
         $router = $this->container->get('router');
 
+        /** @var Renderer $renderer */
+        $renderer = $this->container->get('renderer');
+
         $callable = $router->getHandler((string) $_SERVER['REQUEST_URI']);
 
-//        var_dump($callable);
+        /** @var array{view: string, args: array} $response */
+        $response = call_user_func($callable);
 
-        $response = (string) call_user_func($callable);
-
-        return $response;
+        return $renderer->render($response['view'], $response['args']);
     }
 }

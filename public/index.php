@@ -6,4 +6,5 @@
  */
 
 require_once '../vendor/autoload.php';
+
 echo (new \App\Kernel())->bootstrap();
