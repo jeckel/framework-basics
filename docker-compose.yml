@@ -1,0 +1,11 @@
+version: '3.2'
+
+services:
+  project:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/project
+    ports:
+      - '8080:80'
