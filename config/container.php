@@ -27,10 +27,14 @@ return [
             'action' => 'indexAction'
         ],
         'routes' => [
-            "/^\/hello\/([a-zA-Z0-9]*)$/m" => [
+            "/hello/{lastname}/{firstname}" => [
                 'controller' => IndexController::class,
                 'action' => 'helloAction'
-            ]
+            ],
+            "/hello/{lastname}" => [
+                'controller' => IndexController::class,
+                'action' => 'helloAction'
+            ],
         ]
     ]
 ];

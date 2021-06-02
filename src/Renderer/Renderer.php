@@ -45,7 +45,6 @@ class Renderer
 
         $values = array_merge($this->defaults, $args);
 
-
         $viewPath = $this->templatePath . DIRECTORY_SEPARATOR . $view;
 
         if (! is_readable($viewPath)) {

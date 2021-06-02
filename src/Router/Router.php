@@ -35,61 +35,68 @@ class Router
     }
 
     /**
-     * @param string $requestUri
+     * @param Request $request
      * @return callable
      */
-    public function getHandler(string $requestUri): callable
+    public function getHandler(Request $request): callable
     {
-        $route = $this->findMatchingRoute($requestUri);
+        $route = $this->findMatchingRoute($request);
         if (null === $route) {
-            return $this->resolve($this->routingRules['default']);
+            return $this->resolve(
+                new MatchedRoute(
+                    $this->routingRules['default']['controller'],
+                    $this->routingRules['default']['action'],
+                    []
+                )
+            );
         }
 
-        return $this->resolve($route['handler'], $route['matches']);
+        return $this->resolve($route);
     }
 
     /**
-     * @param string $requestUri
-     * @return array|null
+     * @param Request $request
+     * @return MatchedRoute|null
      */
-    protected function findMatchingRoute(string $requestUri): ?array
+    protected function findMatchingRoute(Request $request): ?MatchedRoute
     {
         $matches = [];
         /**
          * @var string $rule
-         * @var array $handler
+         * @var array{controller: class-string, action: string} $handler
          */
         foreach ($this->routingRules['routes'] as $rule => $handler) {
-            if (preg_match($rule, $requestUri, $matches)) {
-                return [
-                    'handler' => $handler,
-                    'matches' => [$matches[1]],
-                ];
+            $reg = '/(\{\w*\})/m';
+            $subst = '(\\\\w*)';
+            $eregRule = '/^' . str_replace('/', '\/', preg_replace($reg, $subst, $rule)) . '$/';
+
+            if (preg_match_all($eregRule, $request->getRequestUri(), $matches)) {
+                array_shift($matches);
+                $values = array_map(static fn (array $match) => $match[0], $matches);
+                preg_match_all('/\{(\w*)\}/m', $rule, $matches);
+                $varNames = $matches[1];
+
+                return new MatchedRoute($handler['controller'], $handler['action'], array_combine($varNames, $values));
             }
         }
         return null;
     }
 
     /**
-     * @param array{controller: class-string, action: string} $rule
-     * @param array|null $arguments
+     * @param MatchedRoute $matchedRoute
      * @return callable
      */
-    protected function resolve(array $rule, ?array $arguments = null): callable
+    protected function resolve(MatchedRoute $matchedRoute): callable
     {
-        if (null === $arguments) {
-            return [
-                $this->container->get($rule['controller']),
-                $rule['action'],
-            ];
-        }
-
-        return fn(): callable => call_user_func_array(
-            [
-                $this->container->get($rule['controller']),
-                $rule['action'],
-            ],
-            $arguments
-        );
+        /** @psalm-suppress MixedInferredReturnType */
+        return fn(): array =>
+            /** @psalm-suppress MixedReturnStatement */
+            call_user_func_array(
+                [
+                    $this->container->get($matchedRoute->getControllerName()),
+                    $matchedRoute->getActionName(),
+                ],
+                $matchedRoute->getArguments()
+            );
     }
 }

@@ -11,6 +11,7 @@ namespace App;
 
 use App\Container\Container;
 use App\Renderer\Renderer;
+use App\Router\Request;
 use App\Router\Router;
 
 class Kernel
@@ -32,7 +33,8 @@ class Kernel
         /** @var Renderer $renderer */
         $renderer = $this->container->get('renderer');
 
-        $callable = $router->getHandler((string) $_SERVER['REQUEST_URI']);
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        $callable = $router->getHandler(new Request($_SERVER));
 
         /** @var array{view: string, args: array} $response */
         $response = call_user_func($callable);
