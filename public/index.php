@@ -5,12 +5,5 @@
  * Created at: 02/06/2021
  */
 
-?>
-<html lang="fr">
-<head>
-    <title>Hello</title>
-</head>
-<body>
-    <h1>Hello world</h1>
-</body>
-</html>
+require_once '../vendor/autoload.php';
+echo (new \App\Kernel())->bootstrap();

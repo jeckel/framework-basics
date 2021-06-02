@@ -10,6 +10,7 @@
         <directory name="src" />
         <ignoreFiles>
             <directory name="vendor" />
+            <file name="config/container.php"/>
         </ignoreFiles>
     </projectFiles>
 </psalm>
